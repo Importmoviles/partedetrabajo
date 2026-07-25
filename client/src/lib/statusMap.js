@@ -2,7 +2,7 @@ export const statusMap = {
   presupuestado: { label: "Presupuestado", color: "var(--color-slate)" },
   en_curso: { label: "En curso", color: "var(--color-amber)" },
   finalizado: { label: "Finalizado", color: "var(--color-teal)" },
-  facturado: { label: "Facturado", color: "var(--color-indigo)" },
+  facturado: { label: "Con parte", color: "var(--color-indigo)" },
   borrador: { label: "Borrador", color: "var(--color-slate)" },
   emitida: { label: "Emitida", color: "var(--color-amber)" },
   pagada: { label: "Pagada", color: "var(--color-teal)" },

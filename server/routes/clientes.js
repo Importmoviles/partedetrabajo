@@ -63,7 +63,7 @@ router.delete("/:id", (req, res) => {
     if (result.changes === 0) return res.status(404).json({ error: "Cliente no encontrado" });
     res.json({ ok: true });
   } catch (err) {
-    res.status(400).json({ error: "No se puede borrar: el cliente tiene trabajos o facturas asociadas" });
+    res.status(400).json({ error: "No se puede borrar: el cliente tiene trabajos o partes de trabajo asociados" });
   }
 });
 

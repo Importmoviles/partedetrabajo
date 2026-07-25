@@ -9,6 +9,28 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const db = new DatabaseSync(path.join(dataDir, "panel.db"));
 db.exec("PRAGMA foreign_keys = ON;");
 
+// --- Migración: "factura" -> "parte de trabajo" (conserva todas las filas existentes) ---
+function tableExists(name) {
+  return Boolean(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name = ?").get(name));
+}
+
+if (tableExists("facturas") && !tableExists("partes")) {
+  db.exec("ALTER TABLE facturas RENAME TO partes");
+  console.log('Migración: tabla "facturas" renombrada a "partes" (datos conservados)');
+}
+if (tableExists("factura_lineas") && !tableExists("parte_lineas")) {
+  db.exec("ALTER TABLE factura_lineas RENAME TO parte_lineas");
+  db.exec("ALTER TABLE parte_lineas RENAME COLUMN factura_id TO parte_id");
+}
+if (tableExists("factura_trabajos") && !tableExists("parte_trabajos")) {
+  db.exec("ALTER TABLE factura_trabajos RENAME TO parte_trabajos");
+  db.exec("ALTER TABLE parte_trabajos RENAME COLUMN factura_id TO parte_id");
+}
+if (tableExists("partes")) {
+  // Numeración antigua FAC-0001 -> PARTE-0001 (no-op si ya está migrado)
+  db.exec("UPDATE partes SET numero = 'PARTE-' || substr(numero, 5) WHERE numero LIKE 'FAC-%'");
+}
+
 db.exec(`
 CREATE TABLE IF NOT EXISTS usuarios (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +82,7 @@ CREATE TABLE IF NOT EXISTS materiales (
   proveedor TEXT
 );
 
-CREATE TABLE IF NOT EXISTS facturas (
+CREATE TABLE IF NOT EXISTS partes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   numero TEXT UNIQUE NOT NULL,
   cliente_id INTEGER NOT NULL REFERENCES clientes(id) ON DELETE RESTRICT,
@@ -70,20 +92,31 @@ CREATE TABLE IF NOT EXISTS facturas (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
-CREATE TABLE IF NOT EXISTS factura_trabajos (
-  factura_id INTEGER NOT NULL REFERENCES facturas(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS parte_trabajos (
+  parte_id INTEGER NOT NULL REFERENCES partes(id) ON DELETE CASCADE,
   trabajo_id INTEGER NOT NULL REFERENCES trabajos(id) ON DELETE CASCADE,
-  PRIMARY KEY (factura_id, trabajo_id)
+  PRIMARY KEY (parte_id, trabajo_id)
 );
 
-CREATE TABLE IF NOT EXISTS factura_lineas (
+CREATE TABLE IF NOT EXISTS parte_lineas (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  factura_id INTEGER NOT NULL REFERENCES facturas(id) ON DELETE CASCADE,
+  parte_id INTEGER NOT NULL REFERENCES partes(id) ON DELETE CASCADE,
   tipo TEXT NOT NULL DEFAULT 'fijo',
   descripcion TEXT NOT NULL,
   cantidad REAL NOT NULL DEFAULT 1,
   precio_unitario REAL NOT NULL DEFAULT 0,
   orden INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS materiales_catalogo (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tipo TEXT NOT NULL DEFAULT 'fisico',
+  nombre TEXT NOT NULL,
+  coste REAL NOT NULL DEFAULT 0,
+  precio_venta REAL NOT NULL DEFAULT 0,
+  proveedor TEXT,
+  activo INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS documentos (

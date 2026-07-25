@@ -7,10 +7,6 @@ export function trabajoCodigo(id) {
   return `TRB-${String(id).padStart(4, "0")}`;
 }
 
-export function facturaCodigo(numero) {
-  return numero;
-}
-
 export function JobCard({ job }) {
   const navigate = useNavigate();
   const s = statusMap[job.estado] || statusMap.presupuestado;
@@ -34,23 +30,23 @@ export function JobCard({ job }) {
   );
 }
 
-export function InvoiceCard({ inv }) {
+export function ParteCard({ parte }) {
   const navigate = useNavigate();
-  const s = statusMap[inv.estado] || statusMap.borrador;
+  const s = statusMap[parte.estado] || statusMap.borrador;
   return (
-    <Card onClick={() => navigate(`/facturas/${inv.id}`)}>
+    <Card onClick={() => navigate(`/partes/${parte.id}`)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <StatusDot color={s.color} />
-          <span className="font-mono text-[11px] text-muted">#{inv.numero}</span>
+          <span className="font-mono text-[11px] text-muted">#{parte.numero}</span>
         </div>
         <StatusBadge label={s.label} color={s.color} />
       </div>
       <div className="mt-1.5 flex items-center justify-between">
-        <span className="font-display text-[15px] font-semibold text-ink">{inv.cliente_nombre}</span>
-        <span className="font-mono text-sm font-semibold text-ink">{formatEUR(inv.total)}</span>
+        <span className="font-display text-[15px] font-semibold text-ink">{parte.cliente_nombre}</span>
+        <span className="font-mono text-sm font-semibold text-ink">{formatEUR(parte.total)}</span>
       </div>
-      <div className="text-xs text-muted">{inv.fecha}</div>
+      <div className="text-xs text-muted">{parte.fecha}</div>
     </Card>
   );
 }

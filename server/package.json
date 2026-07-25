@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch --experimental-sqlite index.js",
+    "dev": "node --watch-path=index.js --watch-path=db.js --watch-path=routes --watch-path=middleware --experimental-sqlite index.js",
     "start": "node --experimental-sqlite index.js"
   },
   "keywords": [],

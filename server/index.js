@@ -9,9 +9,10 @@ const { requireAuth } = require("./middleware/auth");
 const authRoutes = require("./routes/auth");
 const clientesRoutes = require("./routes/clientes");
 const trabajosRoutes = require("./routes/trabajos");
-const facturasRoutes = require("./routes/facturas");
+const partesRoutes = require("./routes/partes");
 const documentosRoutes = require("./routes/documentos");
 const dashboardRoutes = require("./routes/dashboard");
+const materialesCatalogoRoutes = require("./routes/materialesCatalogo");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,9 +34,10 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/clientes", requireAuth, clientesRoutes);
 app.use("/api/trabajos", requireAuth, trabajosRoutes);
-app.use("/api/facturas", requireAuth, facturasRoutes);
+app.use("/api/partes", requireAuth, partesRoutes);
 app.use("/api/documentos", requireAuth, documentosRoutes);
 app.use("/api/dashboard", requireAuth, dashboardRoutes);
+app.use("/api/materiales-catalogo", requireAuth, materialesCatalogoRoutes);
 
 // En producción, Express sirve el frontend ya compilado (npm run build en client/)
 const clientDist = path.join(__dirname, "client-dist");

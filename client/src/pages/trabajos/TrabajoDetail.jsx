@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Pencil, Trash2, Plus, X, Receipt } from "lucide-react";
+import { Pencil, Trash2, Plus, X, ClipboardList } from "lucide-react";
 import { api } from "../../lib/api";
 import { Button, Input, SectionLabel, Select, StatusBadge, StatusDot } from "../../components/ui";
 import { trabajoCodigo } from "../../components/cards";
@@ -107,8 +107,8 @@ export default function TrabajoDetail() {
         {trabajo.notas_tecnicas && <p className="text-ink mt-2 whitespace-pre-wrap">{trabajo.notas_tecnicas}</p>}
       </div>
 
-      <Button className="mt-3 flex items-center gap-1.5" onClick={() => navigate(`/facturas/nueva?trabajo_id=${trabajo.id}`)}>
-        <Receipt size={15} /> Facturar este trabajo
+      <Button className="mt-3 flex items-center gap-1.5" onClick={() => navigate(`/partes/nueva?trabajo_id=${trabajo.id}`)}>
+        <ClipboardList size={15} /> Generar parte de trabajo
       </Button>
 
       <DocumentosSection trabajoId={id} />

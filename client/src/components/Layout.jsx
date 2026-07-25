@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Home, Wrench, Users, FileText, Plus, LogOut } from "lucide-react";
+import { Home, Wrench, Users, ClipboardList, Boxes, Plus, LogOut } from "lucide-react";
 import { mIconB64 } from "../assets/logo";
 import { useAuth } from "../context/AuthContext";
 
@@ -7,14 +7,16 @@ const tabs = [
   { to: "/", label: "Inicio", icon: Home, end: true },
   { to: "/trabajos", label: "Trabajos", icon: Wrench },
   { to: "/clientes", label: "Clientes", icon: Users },
-  { to: "/facturas", label: "Facturas", icon: FileText },
+  { to: "/partes", label: "Partes", icon: ClipboardList },
+  { to: "/maestros", label: "Maestros", icon: Boxes },
 ];
 
 const fabTarget = {
   "/": "/trabajos/nuevo",
   "/trabajos": "/trabajos/nuevo",
   "/clientes": "/clientes/nuevo",
-  "/facturas": "/facturas/nueva",
+  "/partes": "/partes/nueva",
+  "/maestros": "/maestros/nuevo",
 };
 
 function TabButton({ to, label, icon: Icon, end }) {

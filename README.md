@@ -1,6 +1,6 @@
 # Panel de gestión — ImportMóviles Technologies (Fase 1)
 
-Panel de trabajo interno: clientes, trabajos, materiales, facturación con PDF y documentación adjunta.
+Panel de trabajo interno: clientes, trabajos, materiales, partes de trabajo con PDF, catálogo de materiales/componentes y documentación adjunta.
 
 ## Stack
 
@@ -9,7 +9,7 @@ Panel de trabajo interno: clientes, trabajos, materiales, facturación con PDF y
 - **Frontend:** React + Vite + Tailwind CSS (`client/`)
 - **Login:** usuario único con sesión (cookie), pensado solo para ti en esta Fase 1
 - **Archivos:** subidos a `server/uploads/`
-- **Facturas:** generadas en PDF con `pdfkit`
+- **Partes de trabajo:** generados en PDF con `pdfkit`
 
 ## Primer arranque
 
@@ -55,7 +55,7 @@ si quieres acceder desde fuera de casa/oficina — eso es un paso aparte que no 
 
 Todo lo importante vive en dos sitios, ambos dentro de `server/`:
 
-- `data/panel.db` — toda la base de datos (clientes, trabajos, facturas...)
+- `data/panel.db` — toda la base de datos (clientes, trabajos, partes de trabajo...)
 - `uploads/` — los archivos subidos (fotos, contratos, certificados...)
 
 Copiar esas dos carpetas a otro sitio (otro disco, un USB, la nube) es toda la copia de seguridad que necesitas.
@@ -79,10 +79,10 @@ directamente — si llega el momento, pídemelo y lo dejamos como una pantalla d
 server/
   index.js              punto de entrada
   db.js                  esquema de la base de datos
-  routes/                un archivo por módulo (clientes, trabajos, facturas, documentos, auth, dashboard)
+  routes/                un archivo por módulo (clientes, trabajos, partes, materialesCatalogo, documentos, auth, dashboard)
   middleware/auth.js      protege la API para que solo tú puedas usarla
 client/
-  src/pages/              una carpeta por módulo (clientes, trabajos, facturas) + Inicio, Login
+  src/pages/              una carpeta por módulo (clientes, trabajos, partes, maestros) + Inicio, Login
   src/components/         piezas visuales reutilizadas (tarjetas, botones, subida de documentos)
   src/lib/                cliente HTTP hacia la API y catálogos (categorías, estados)
 ```
@@ -91,4 +91,12 @@ client/
 
 Cuando llegue el momento: añadir un rol "cliente" en la tabla `usuarios`, endpoints que filtren por
 `cliente_id` del usuario logueado, y una sección de tickets. La base de datos actual ya está pensada
-para eso (las tablas `clientes`, `trabajos`, `facturas` y `documentos` no cambian).
+para eso (las tablas `clientes`, `trabajos`, `partes` y `documentos` no cambian).
+
+## Notas de migración (julio 2026)
+
+Esta versión renombró "Factura" a "Parte de trabajo" en toda la aplicación (tablas, rutas y textos).
+La migración es automática: al arrancar el servidor con datos antiguos, `db.js` detecta las tablas
+`facturas`/`factura_lineas`/`factura_trabajos` y las renombra conservando todas las filas — no hace
+falta ningún paso manual, basta con `git pull` y reiniciar. También se añadió un catálogo maestro de
+Materiales y Componentes (pestaña "Maestros").

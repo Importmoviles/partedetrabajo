@@ -130,7 +130,7 @@ router.delete("/:id", (req, res) => {
     if (result.changes === 0) return res.status(404).json({ error: "Trabajo no encontrado" });
     res.json({ ok: true });
   } catch (err) {
-    res.status(400).json({ error: "No se puede borrar: el trabajo está incluido en una factura" });
+    res.status(400).json({ error: "No se puede borrar: el trabajo está incluido en un parte de trabajo" });
   }
 });
 

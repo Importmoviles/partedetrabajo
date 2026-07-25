@@ -106,7 +106,7 @@ export default function TrabajoForm() {
               <option value="presupuestado">Presupuestado</option>
               <option value="en_curso">En curso</option>
               <option value="finalizado">Finalizado</option>
-              <option value="facturado">Facturado</option>
+              <option value="facturado">Con parte</option>
             </Select>
           </Field>
         </div>

@@ -9,9 +9,11 @@ import ClienteDetail from "./pages/clientes/ClienteDetail";
 import TrabajosList from "./pages/trabajos/TrabajosList";
 import TrabajoForm from "./pages/trabajos/TrabajoForm";
 import TrabajoDetail from "./pages/trabajos/TrabajoDetail";
-import FacturasList from "./pages/facturas/FacturasList";
-import FacturaForm from "./pages/facturas/FacturaForm";
-import FacturaDetail from "./pages/facturas/FacturaDetail";
+import PartesList from "./pages/partes/PartesList";
+import ParteForm from "./pages/partes/ParteForm";
+import ParteDetail from "./pages/partes/ParteDetail";
+import MaterialesCatalogoList from "./pages/maestros/MaterialesCatalogoList";
+import MaterialCatalogoForm from "./pages/maestros/MaterialCatalogoForm";
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -50,9 +52,13 @@ export default function App() {
         <Route path="trabajos/:id" element={<TrabajoDetail />} />
         <Route path="trabajos/:id/editar" element={<TrabajoForm />} />
 
-        <Route path="facturas" element={<FacturasList />} />
-        <Route path="facturas/nueva" element={<FacturaForm />} />
-        <Route path="facturas/:id" element={<FacturaDetail />} />
+        <Route path="partes" element={<PartesList />} />
+        <Route path="partes/nueva" element={<ParteForm />} />
+        <Route path="partes/:id" element={<ParteDetail />} />
+
+        <Route path="maestros" element={<MaterialesCatalogoList />} />
+        <Route path="maestros/nuevo" element={<MaterialCatalogoForm />} />
+        <Route path="maestros/:id/editar" element={<MaterialCatalogoForm />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

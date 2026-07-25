@@ -7,7 +7,7 @@ import { formatEUR } from "../../lib/statusMap";
 
 const emptyLinea = { tipo: "fijo", descripcion: "", cantidad: 1, precio_unitario: "" };
 
-export default function FacturaForm() {
+export default function ParteForm() {
   const [searchParams] = useSearchParams();
   const trabajoId = searchParams.get("trabajo_id");
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ export default function FacturaForm() {
 
     setSaving(true);
     try {
-      const factura = await api.post("/facturas", {
+      const parte = await api.post("/partes", {
         cliente_id: Number(clienteId),
         trabajo_ids: trabajoIds,
         iva: Number(iva),
@@ -103,7 +103,7 @@ export default function FacturaForm() {
           precio_unitario: Number(l.precio_unitario) || 0,
         })),
       });
-      navigate(`/facturas/${factura.id}`);
+      navigate(`/partes/${parte.id}`);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -115,7 +115,7 @@ export default function FacturaForm() {
 
   return (
     <>
-      <h1 className="font-display text-lg font-semibold mt-4 mb-4">Nueva factura</h1>
+      <h1 className="font-display text-lg font-semibold mt-4 mb-4">Nuevo parte de trabajo</h1>
       <form onSubmit={handleSubmit}>
         <Field label="Cliente *">
           <Select value={clienteId} onChange={(e) => setClienteId(e.target.value)} disabled={Boolean(trabajoId)}>
@@ -190,7 +190,7 @@ export default function FacturaForm() {
 
         <div className="flex gap-2">
           <Button type="submit" disabled={saving}>
-            {saving ? "Guardando..." : "Crear factura"}
+            {saving ? "Guardando..." : "Crear parte de trabajo"}
           </Button>
           <Button type="button" variant="secondary" onClick={() => navigate(-1)}>
             Cancelar

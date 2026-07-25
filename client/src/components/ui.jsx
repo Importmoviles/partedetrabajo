@@ -40,14 +40,18 @@ export function Chip({ children, active, onClick }) {
   );
 }
 
-export function Stat({ label, value, accent }) {
+export function Stat({ label, value, accent, onClick, active }) {
+  const Tag = onClick ? "button" : "div";
   return (
-    <div className="flex-1 rounded-2xl p-3 bg-surface border border-line">
+    <Tag
+      onClick={onClick}
+      className={`flex-1 rounded-2xl p-3 bg-surface border text-left ${active ? "border-brand" : "border-line"}`}
+    >
       <div className="font-mono text-xl font-semibold" style={{ color: accent || "var(--color-ink)" }}>
         {value}
       </div>
       <div className="text-[11px] text-muted mt-0.5">{label}</div>
-    </div>
+    </Tag>
   );
 }
 
