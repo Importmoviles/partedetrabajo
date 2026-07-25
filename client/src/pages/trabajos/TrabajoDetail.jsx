@@ -5,6 +5,7 @@ import { api } from "../../lib/api";
 import { Button, Input, SectionLabel, Select, StatusBadge, StatusDot } from "../../components/ui";
 import { trabajoCodigo } from "../../components/cards";
 import DocumentosSection from "../../components/DocumentosSection";
+import MaterialAutocomplete from "../../components/MaterialAutocomplete";
 import { statusMap, formatEUR } from "../../lib/statusMap";
 
 const emptyEquipo = { marca: "", modelo: "", numero_serie: "" };
@@ -19,12 +20,18 @@ export default function TrabajoDetail() {
   const [showEquipoForm, setShowEquipoForm] = useState(false);
   const [materialForm, setMaterialForm] = useState(emptyMaterial);
   const [showMaterialForm, setShowMaterialForm] = useState(false);
+  const [catalogo, setCatalogo] = useState([]);
 
   function load() {
     api.get(`/trabajos/${id}`).then(setTrabajo);
   }
 
+  function loadCatalogo() {
+    api.get("/materiales-catalogo?activo=1").then(setCatalogo);
+  }
+
   useEffect(load, [id]);
+  useEffect(loadCatalogo, []);
 
   async function handleDelete() {
     if (!confirm("¿Borrar este trabajo? Esta acción no se puede deshacer.")) return;
@@ -65,6 +72,29 @@ export default function TrabajoDetail() {
   async function removeMaterial(materialId) {
     await api.del(`/trabajos/materiales/${materialId}`);
     load();
+  }
+
+  function selectCatalogItem(item) {
+    setMaterialForm({
+      tipo: item.tipo,
+      nombre: item.nombre,
+      cantidad: materialForm.cantidad || 1,
+      coste: item.coste,
+      precio_venta: item.precio_venta,
+      proveedor: item.proveedor || "",
+    });
+  }
+
+  async function createCatalogItem(nombre) {
+    const nuevo = await api.post("/materiales-catalogo", {
+      tipo: materialForm.tipo,
+      nombre,
+      coste: Number(materialForm.coste) || 0,
+      precio_venta: Number(materialForm.precio_venta) || 0,
+      proveedor: materialForm.proveedor || null,
+    });
+    setCatalogo((prev) => [...prev, nuevo]);
+    setMaterialForm({ ...materialForm, nombre: nuevo.nombre });
   }
 
   if (!trabajo) return <p className="text-muted text-sm mt-6">Cargando...</p>;
@@ -182,13 +212,15 @@ export default function TrabajoDetail() {
             </Select>
             <Input placeholder="Proveedor" value={materialForm.proveedor} onChange={(e) => setMaterialForm({ ...materialForm, proveedor: e.target.value })} />
           </div>
-          <Input
-            placeholder="Nombre *"
-            value={materialForm.nombre}
-            onChange={(e) => setMaterialForm({ ...materialForm, nombre: e.target.value })}
-            required
-            className="mb-2"
-          />
+          <div className="mb-2">
+            <MaterialAutocomplete
+              items={catalogo}
+              value={materialForm.nombre}
+              onChangeText={(v) => setMaterialForm({ ...materialForm, nombre: v })}
+              onSelect={selectCatalogItem}
+              onCreate={createCatalogItem}
+            />
+          </div>
           <div className="grid grid-cols-3 gap-2 mb-2">
             <Input
               type="number"

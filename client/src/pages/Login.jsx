@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { mIconB64 } from "../assets/logo";
 import { useAuth } from "../context/AuthContext";
 import { Button, Field, Input } from "../components/ui";
 
@@ -30,14 +29,8 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-ink px-4">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
-          <img src={mIconB64} alt="ImportMóviles" className="h-12 w-auto mb-3" />
-          <div className="flex items-baseline gap-1 font-display font-bold text-2xl">
-            <span className="text-paper">Import</span>
-            <span className="text-brand">Móviles</span>
-          </div>
-          <div className="text-[10px] text-[#8A938A] mt-1 tracking-[0.18em] uppercase">
-            Technologies · panel de gestión
-          </div>
+          <img src="/logo-importmoviles.png" alt="ImportMóviles Technologies" className="h-20 w-auto mb-2" />
+          <div className="text-[10px] text-[#8A938A] mt-1 tracking-[0.18em] uppercase">panel de gestión</div>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-surface rounded-2xl p-5">

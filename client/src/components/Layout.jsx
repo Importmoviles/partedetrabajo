@@ -1,6 +1,5 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Home, Wrench, Users, ClipboardList, Boxes, Plus, LogOut } from "lucide-react";
-import { mIconB64 } from "../assets/logo";
 import { useAuth } from "../context/AuthContext";
 
 const tabs = [
@@ -48,20 +47,12 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col bg-paper">
       <div className="px-4 pt-5 pb-4 bg-ink sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src={mIconB64} alt="ImportMóviles" className="h-6 w-auto" />
-            <div className="flex items-baseline gap-0.5 font-display font-bold text-[17px]">
-              <span className="text-paper">Import</span>
-              <span className="text-brand">Móviles</span>
-            </div>
-          </div>
+          <img src="/logo-importmoviles.png" alt="ImportMóviles Technologies" className="h-7 w-auto" />
           <button onClick={logout} aria-label="Cerrar sesión" className="text-[#8A938A]">
             <LogOut size={17} />
           </button>
         </div>
-        <div className="text-[9.5px] text-[#8A938A] mt-1 tracking-[0.18em] uppercase">
-          Technologies · panel de gestión
-        </div>
+        <div className="text-[9.5px] text-[#8A938A] mt-1.5 tracking-[0.18em] uppercase">panel de gestión</div>
         <div className="text-[11.5px] text-[#6E756E] mt-1.5 capitalize">{today}</div>
       </div>
 
