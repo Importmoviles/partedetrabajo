@@ -43,7 +43,7 @@ export default function MaterialCatalogoForm() {
       };
       if (editing) await api.put(`/materiales-catalogo/${id}`, payload);
       else await api.post("/materiales-catalogo", payload);
-      navigate("/maestros");
+      navigate("/maestros/materiales");
     } catch (err) {
       setError(err.message);
     } finally {

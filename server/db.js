@@ -119,6 +119,14 @@ CREATE TABLE IF NOT EXISTS materiales_catalogo (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS tareas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  titulo TEXT NOT NULL,
+  prioritaria INTEGER NOT NULL DEFAULT 0,
+  completada INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS documentos (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   cliente_id INTEGER REFERENCES clientes(id) ON DELETE SET NULL,

@@ -48,11 +48,12 @@ export default function MaterialesCatalogoList() {
                 Coste {formatEUR(m.coste)} · Venta {formatEUR(m.precio_venta)}
               </div>
             </div>
-            <div className="flex gap-1 shrink-0">
-              <button onClick={() => navigate(`/maestros/${m.id}/editar`)} className="text-muted p-1.5">
+            <div className="flex items-center gap-2 shrink-0">
+              <StatusBadge label="Activo" color="var(--color-brand)" />
+              <button onClick={() => navigate(`/maestros/materiales/${m.id}/editar`)} className="text-muted p-1.5">
                 <Pencil size={15} />
               </button>
-              <button onClick={() => toggle(m.id)} className="text-danger p-1.5" title="Desactivar">
+              <button onClick={() => toggle(m.id)} className="text-brand p-1.5" title="Desactivar">
                 <Power size={15} />
               </button>
             </div>
@@ -73,8 +74,8 @@ export default function MaterialesCatalogoList() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <StatusBadge label="Inactivo" color="var(--color-slate)" />
-                  <button onClick={() => toggle(m.id)} className="text-brand p-1.5" title="Reactivar">
+                  <StatusBadge label="Inactivo" color="var(--color-danger)" />
+                  <button onClick={() => toggle(m.id)} className="text-danger p-1.5" title="Reactivar">
                     <Power size={15} />
                   </button>
                 </div>

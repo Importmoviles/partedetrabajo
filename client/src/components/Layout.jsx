@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Home, Wrench, Users, ClipboardList, Boxes, Plus, LogOut } from "lucide-react";
+import { Home, Wrench, Users, ClipboardList, ListChecks, Boxes, Plus, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const tabs = [
@@ -7,6 +7,7 @@ const tabs = [
   { to: "/trabajos", label: "Trabajos", icon: Wrench },
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/partes", label: "Partes", icon: ClipboardList },
+  { to: "/tareas", label: "Tareas", icon: ListChecks },
   { to: "/maestros", label: "Maestros", icon: Boxes },
 ];
 
@@ -15,8 +16,19 @@ const fabTarget = {
   "/trabajos": "/trabajos/nuevo",
   "/clientes": "/clientes/nuevo",
   "/partes": "/partes/nueva",
-  "/maestros": "/maestros/nuevo",
+  "/tareas": "/tareas/nueva",
+  "/maestros/materiales": "/maestros/materiales/nuevo",
+  "/maestros/usuarios": "/maestros/usuarios/nuevo",
 };
+
+function getFabTarget(pathname) {
+  if (pathname.startsWith("/maestros/")) {
+    const seccion = "/" + pathname.split("/").slice(1, 3).join("/");
+    return fabTarget[seccion];
+  }
+  const basePath = "/" + (pathname.split("/")[1] || "");
+  return fabTarget[basePath];
+}
 
 function TabButton({ to, label, icon: Icon, end }) {
   return (
@@ -38,8 +50,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const basePath = "/" + (location.pathname.split("/")[1] || "");
-  const fab = fabTarget[basePath];
+  const fab = getFabTarget(location.pathname);
 
   const today = new Date().toLocaleDateString("es-ES", { weekday: "long", day: "2-digit", month: "long" });
 
@@ -47,7 +58,7 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col bg-paper">
       <div className="px-4 pt-5 pb-4 bg-ink sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <img src="/logo-importmoviles.png" alt="ImportMóviles Technologies" className="h-7 w-auto" />
+          <img src="/logo-importmoviles.png" alt="ImportMóviles Technologies" className="h-14 w-auto" />
           <button onClick={logout} aria-label="Cerrar sesión" className="text-[#8A938A]">
             <LogOut size={17} />
           </button>
