@@ -51,6 +51,16 @@ npm start               # sirve todo en http://localhost:3001
 Para que el móvil pueda entrar, ese `:3001` tiene que ser accesible desde la red (o publicado con HTTPS
 si quieres acceder desde fuera de casa/oficina — eso es un paso aparte que no hemos configurado en esta fase).
 
+## Actualizar el servidor en producción (partes.importmoviles.com)
+
+Está desplegado en Plesk, que gestiona el proceso Node con su propio supervisor — **no** con el `npm start`
+que lanzarías a mano por SSH. Tras cada cambio, en este orden:
+
+1. `git pull`
+2. `cd client && npm run build`
+3. **Reiniciar la app desde Plesk**: Sitios web y dominios → `partes.importmoviles.com` → pestaña Node.js →
+   "Restart App". Sin este paso, la web sigue sirviendo el proceso viejo aunque los archivos ya estén actualizados.
+
 ## Copias de seguridad
 
 Todo lo importante vive en dos sitios, ambos dentro de `server/`:
