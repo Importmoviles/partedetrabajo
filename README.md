@@ -89,13 +89,20 @@ directamente — si llega el momento, pídemelo y lo dejamos como una pantalla d
 server/
   index.js              punto de entrada
   db.js                  esquema de la base de datos
-  routes/                un archivo por módulo (clientes, trabajos, partes, materialesCatalogo, documentos, auth, dashboard)
+  routes/                un archivo por módulo (clientes, trabajos, partes, materialesCatalogo, proveedores, usuarios, tareas, documentos, auth, dashboard)
   middleware/auth.js      protege la API para que solo tú puedas usarla
 client/
   src/pages/              una carpeta por módulo (clientes, trabajos, partes, maestros) + Inicio, Login
   src/components/         piezas visuales reutilizadas (tarjetas, botones, subida de documentos)
   src/lib/                cliente HTTP hacia la API y catálogos (categorías, estados)
 ```
+
+## Relación con el CRM (panel-crm)
+
+Esta app es la "dueña" del esquema base de la base de datos compartida (`clientes`, `trabajos`, `partes`,
+`usuarios`, `materiales_catalogo`, `proveedores`...). El CRM (`../panel-crm`) abre el mismo archivo
+`panel.db` y solo añade cosas encima (más columnas en clientes, contactos, facturas reales, gastos) —
+por eso esta app siempre tiene que arrancar primero, al menos una vez, para crear el esquema base.
 
 ## Qué falta para la Fase 2 (portal de clientes)
 

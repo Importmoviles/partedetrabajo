@@ -3,18 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Pencil, Power } from "lucide-react";
 import { api } from "../../lib/api";
 import { Card, SectionLabel, StatusBadge } from "../../components/ui";
-import { formatEUR } from "../../lib/statusMap";
 
-const tipoLabel = { fisico: "Físico", licencia: "Licencia/software" };
-
-export default function MaterialesCatalogoList() {
+export default function ProveedoresList() {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   function load() {
     api
-      .get("/materiales-catalogo")
+      .get("/proveedores")
       .then(setItems)
       .finally(() => setLoading(false));
   }
@@ -22,7 +19,7 @@ export default function MaterialesCatalogoList() {
   useEffect(load, []);
 
   async function toggle(id) {
-    await api.post(`/materiales-catalogo/${id}/toggle`);
+    await api.post(`/proveedores/${id}/toggle`);
     load();
   }
 
@@ -33,27 +30,25 @@ export default function MaterialesCatalogoList() {
 
   return (
     <>
-      <SectionLabel>Materiales y componentes ({activos.length} activos)</SectionLabel>
-      {items.length === 0 && <p className="text-sm text-muted">Todavía no hay materiales en el catálogo. Pulsa + para crear el primero.</p>}
+      <SectionLabel>Proveedores ({activos.length} activos)</SectionLabel>
+      {items.length === 0 && <p className="text-sm text-muted">Todavía no hay proveedores. Pulsa + para crear el primero.</p>}
 
-      {activos.map((m) => (
-        <Card key={m.id}>
+      {activos.map((p) => (
+        <Card key={p.id}>
           <div className="flex items-start justify-between">
             <div>
-              <div className="font-display text-[15px] font-semibold text-ink">{m.nombre}</div>
+              <div className="font-display text-[15px] font-semibold text-ink">{p.nombre}</div>
               <div className="text-xs text-muted mt-0.5">
-                {tipoLabel[m.tipo]} {m.proveedor_nombre && `· ${m.proveedor_nombre}`}
+                {p.categoria} {p.contacto && `· ${p.contacto}`}
               </div>
-              <div className="font-mono text-xs text-muted mt-1">
-                Coste {formatEUR(m.coste)} · Venta {formatEUR(m.precio_venta)}
-              </div>
+              <div className="text-xs text-muted mt-0.5">{[p.telefono, p.email].filter(Boolean).join(" · ")}</div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <StatusBadge label="Activo" color="var(--color-brand)" />
-              <button onClick={() => navigate(`/maestros/materiales/${m.id}/editar`)} className="text-muted p-1.5">
+              <button onClick={() => navigate(`/maestros/proveedores/${p.id}/editar`)} className="text-muted p-1.5">
                 <Pencil size={15} />
               </button>
-              <button onClick={() => toggle(m.id)} className="text-brand p-1.5" title="Desactivar">
+              <button onClick={() => toggle(p.id)} className="text-brand p-1.5" title="Desactivar">
                 <Power size={15} />
               </button>
             </div>
@@ -64,18 +59,16 @@ export default function MaterialesCatalogoList() {
       {inactivos.length > 0 && (
         <>
           <SectionLabel>Desactivados ({inactivos.length})</SectionLabel>
-          {inactivos.map((m) => (
-            <Card key={m.id}>
+          {inactivos.map((p) => (
+            <Card key={p.id}>
               <div className="flex items-start justify-between opacity-60">
                 <div>
-                  <div className="font-display text-[15px] font-semibold text-ink">{m.nombre}</div>
-                  <div className="text-xs text-muted mt-0.5">
-                    {tipoLabel[m.tipo]} {m.proveedor_nombre && `· ${m.proveedor_nombre}`}
-                  </div>
+                  <div className="font-display text-[15px] font-semibold text-ink">{p.nombre}</div>
+                  <div className="text-xs text-muted mt-0.5">{p.categoria}</div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <StatusBadge label="Inactivo" color="var(--color-danger)" />
-                  <button onClick={() => toggle(m.id)} className="text-danger p-1.5" title="Reactivar">
+                  <button onClick={() => toggle(p.id)} className="text-danger p-1.5" title="Reactivar">
                     <Power size={15} />
                   </button>
                 </div>

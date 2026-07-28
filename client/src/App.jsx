@@ -17,6 +17,8 @@ import MaterialesCatalogoList from "./pages/maestros/MaterialesCatalogoList";
 import MaterialCatalogoForm from "./pages/maestros/MaterialCatalogoForm";
 import UsuariosList from "./pages/maestros/UsuariosList";
 import UsuarioForm from "./pages/maestros/UsuarioForm";
+import ProveedoresList from "./pages/maestros/ProveedoresList";
+import ProveedorForm from "./pages/maestros/ProveedorForm";
 import TareasList from "./pages/tareas/TareasList";
 import TareaForm from "./pages/tareas/TareaForm";
 
@@ -72,6 +74,9 @@ export default function App() {
         <Route path="maestros/usuarios" element={<UsuariosList />} />
         <Route path="maestros/usuarios/nuevo" element={<UsuarioForm />} />
         <Route path="maestros/usuarios/:id/editar" element={<UsuarioForm />} />
+        <Route path="maestros/proveedores" element={<ProveedoresList />} />
+        <Route path="maestros/proveedores/nuevo" element={<ProveedorForm />} />
+        <Route path="maestros/proveedores/:id/editar" element={<ProveedorForm />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

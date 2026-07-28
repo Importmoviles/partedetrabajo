@@ -6,7 +6,7 @@ import { Button, Input, SectionLabel, Select, StatusBadge, StatusDot } from "../
 import { trabajoCodigo } from "../../components/cards";
 import DocumentosSection from "../../components/DocumentosSection";
 import MaterialAutocomplete from "../../components/MaterialAutocomplete";
-import { statusMap, formatEUR } from "../../lib/statusMap";
+import { estadoTrabajoMap, formatEUR } from "../../lib/statusMap";
 
 const emptyEquipo = { marca: "", modelo: "", numero_serie: "" };
 const emptyMaterial = { tipo: "fisico", nombre: "", cantidad: 1, coste: "", precio_venta: "", proveedor: "" };
@@ -81,7 +81,7 @@ export default function TrabajoDetail() {
       cantidad: materialForm.cantidad || 1,
       coste: item.coste,
       precio_venta: item.precio_venta,
-      proveedor: item.proveedor || "",
+      proveedor: item.proveedor_nombre || "",
     });
   }
 
@@ -91,14 +91,13 @@ export default function TrabajoDetail() {
       nombre,
       coste: Number(materialForm.coste) || 0,
       precio_venta: Number(materialForm.precio_venta) || 0,
-      proveedor: materialForm.proveedor || null,
     });
     setCatalogo((prev) => [...prev, nuevo]);
     setMaterialForm({ ...materialForm, nombre: nuevo.nombre });
   }
 
   if (!trabajo) return <p className="text-muted text-sm mt-6">Cargando...</p>;
-  const s = statusMap[trabajo.estado] || statusMap.presupuestado;
+  const s = estadoTrabajoMap[trabajo.estado] || estadoTrabajoMap.presupuestado;
 
   return (
     <>

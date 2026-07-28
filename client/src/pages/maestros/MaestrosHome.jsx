@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { Boxes, Users, ChevronRight } from "lucide-react";
+import { Boxes, Users, Truck, ChevronRight } from "lucide-react";
 import { Card, SectionLabel } from "../../components/ui";
 
 const secciones = [
   { to: "/maestros/materiales", label: "Materiales y componentes", desc: "Catálogo reutilizable en los trabajos", icon: Boxes },
+  { to: "/maestros/proveedores", label: "Proveedores", desc: "Fichas de proveedores para materiales y compras", icon: Truck },
   { to: "/maestros/usuarios", label: "Usuarios", desc: "Altas, bajas y contraseñas de acceso al panel", icon: Users },
 ];
 

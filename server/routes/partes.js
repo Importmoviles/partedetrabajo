@@ -4,7 +4,7 @@ const db = require("../db");
 
 const router = express.Router();
 
-const ESTADOS = ["borrador", "emitida", "pagada", "vencida"];
+const ESTADOS = ["pendiente", "facturado"];
 
 function nextNumero() {
   const last = db.prepare("SELECT numero FROM partes ORDER BY id DESC LIMIT 1").get();
@@ -59,7 +59,7 @@ router.post("/", (req, res) => {
 
   const numero = nextNumero();
   const info = db
-    .prepare("INSERT INTO partes (numero, cliente_id, estado, iva, fecha) VALUES (?, ?, 'borrador', ?, COALESCE(?, date('now')))")
+    .prepare("INSERT INTO partes (numero, cliente_id, estado, iva, fecha) VALUES (?, ?, 'pendiente', ?, COALESCE(?, date('now')))")
     .run(numero, cliente_id, iva !== undefined ? iva : 21, fecha || null);
 
   const parteId = info.lastInsertRowid;

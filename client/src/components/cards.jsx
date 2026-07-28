@@ -1,7 +1,7 @@
 import { Clock, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card, StatusDot, StatusBadge } from "./ui";
-import { statusMap, formatEUR } from "../lib/statusMap";
+import { estadoTrabajoMap, estadoParteMap, formatEUR } from "../lib/statusMap";
 
 export function trabajoCodigo(id) {
   return `TRB-${String(id).padStart(4, "0")}`;
@@ -9,7 +9,7 @@ export function trabajoCodigo(id) {
 
 export function JobCard({ job }) {
   const navigate = useNavigate();
-  const s = statusMap[job.estado] || statusMap.presupuestado;
+  const s = estadoTrabajoMap[job.estado] || estadoTrabajoMap.presupuestado;
   return (
     <Card onClick={() => navigate(`/trabajos/${job.id}`)}>
       <div className="flex items-start justify-between">
@@ -32,7 +32,7 @@ export function JobCard({ job }) {
 
 export function ParteCard({ parte }) {
   const navigate = useNavigate();
-  const s = statusMap[parte.estado] || statusMap.borrador;
+  const s = estadoParteMap[parte.estado] || estadoParteMap.pendiente;
   return (
     <Card onClick={() => navigate(`/partes/${parte.id}`)}>
       <div className="flex items-center justify-between">

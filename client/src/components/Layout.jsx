@@ -19,6 +19,7 @@ const fabTarget = {
   "/tareas": "/tareas/nueva",
   "/maestros/materiales": "/maestros/materiales/nuevo",
   "/maestros/usuarios": "/maestros/usuarios/nuevo",
+  "/maestros/proveedores": "/maestros/proveedores/nuevo",
 };
 
 function getFabTarget(pathname) {

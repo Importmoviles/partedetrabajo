@@ -8,10 +8,18 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 const db = new DatabaseSync(path.join(dataDir, "panel.db"));
 db.exec("PRAGMA foreign_keys = ON;");
+db.exec("PRAGMA journal_mode = WAL;"); // necesario para acceso concurrente seguro (compartido con el CRM)
 
 // --- Migración: "factura" -> "parte de trabajo" (conserva todas las filas existentes) ---
 function tableExists(name) {
   return Boolean(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name = ?").get(name));
+}
+
+function columnExists(table, column) {
+  return db
+    .prepare(`PRAGMA table_info(${table})`)
+    .all()
+    .some((c) => c.name === column);
 }
 
 if (tableExists("facturas") && !tableExists("partes")) {
@@ -29,6 +37,10 @@ if (tableExists("factura_trabajos") && !tableExists("parte_trabajos")) {
 if (tableExists("partes")) {
   // Numeración antigua FAC-0001 -> PARTE-0001 (no-op si ya está migrado)
   db.exec("UPDATE partes SET numero = 'PARTE-' || substr(numero, 5) WHERE numero LIKE 'FAC-%'");
+  // El parte de trabajo deja de llevar sus propios estados de cobro (eso pasa a vivir
+  // en las facturas del CRM). Se simplifica a pendiente/facturado (no-op si ya migrado).
+  db.exec("UPDATE partes SET estado = 'facturado' WHERE estado = 'pagada'");
+  db.exec("UPDATE partes SET estado = 'pendiente' WHERE estado IN ('borrador', 'emitida', 'vencida')");
 }
 
 db.exec(`
@@ -86,7 +98,7 @@ CREATE TABLE IF NOT EXISTS partes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   numero TEXT UNIQUE NOT NULL,
   cliente_id INTEGER NOT NULL REFERENCES clientes(id) ON DELETE RESTRICT,
-  estado TEXT NOT NULL DEFAULT 'borrador',
+  estado TEXT NOT NULL DEFAULT 'pendiente',
   iva REAL NOT NULL DEFAULT 21,
   fecha TEXT NOT NULL DEFAULT (date('now')),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -106,6 +118,20 @@ CREATE TABLE IF NOT EXISTS parte_lineas (
   cantidad REAL NOT NULL DEFAULT 1,
   precio_unitario REAL NOT NULL DEFAULT 0,
   orden INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS proveedores (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre TEXT NOT NULL,
+  nif TEXT,
+  direccion TEXT,
+  telefono TEXT,
+  email TEXT,
+  contacto TEXT,
+  categoria TEXT,
+  notas TEXT,
+  activo INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE TABLE IF NOT EXISTS materiales_catalogo (
@@ -139,6 +165,28 @@ CREATE TABLE IF NOT EXISTS documentos (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `);
+
+// --- Migración: proveedor (texto libre) -> proveedor_id (tabla proveedores real) ---
+if (!columnExists("materiales_catalogo", "proveedor_id")) {
+  db.exec("ALTER TABLE materiales_catalogo ADD COLUMN proveedor_id INTEGER REFERENCES proveedores(id)");
+
+  const nombresProveedor = db
+    .prepare("SELECT DISTINCT proveedor FROM materiales_catalogo WHERE proveedor IS NOT NULL AND trim(proveedor) != ''")
+    .all()
+    .map((r) => r.proveedor.trim());
+
+  for (const nombre of nombresProveedor) {
+    let proveedor = db.prepare("SELECT id FROM proveedores WHERE nombre = ?").get(nombre);
+    if (!proveedor) {
+      const info = db.prepare("INSERT INTO proveedores (nombre) VALUES (?)").run(nombre);
+      proveedor = { id: info.lastInsertRowid };
+    }
+    db.prepare("UPDATE materiales_catalogo SET proveedor_id = ? WHERE trim(proveedor) = ?").run(proveedor.id, nombre);
+  }
+  if (nombresProveedor.length > 0) {
+    console.log(`Migración: ${nombresProveedor.length} proveedor(es) de materiales convertidos a fichas de proveedor`);
+  }
+}
 
 // Usuario admin por defecto (Fase 1: un único usuario)
 const userCount = db.prepare("SELECT COUNT(*) AS n FROM usuarios").get().n;

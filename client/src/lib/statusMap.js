@@ -1,12 +1,13 @@
-export const statusMap = {
+export const estadoTrabajoMap = {
   presupuestado: { label: "Presupuestado", color: "var(--color-slate)" },
   en_curso: { label: "En curso", color: "var(--color-amber)" },
   finalizado: { label: "Finalizado", color: "var(--color-teal)" },
   facturado: { label: "Con parte", color: "var(--color-indigo)" },
-  borrador: { label: "Borrador", color: "var(--color-slate)" },
-  emitida: { label: "Emitida", color: "var(--color-amber)" },
-  pagada: { label: "Pagada", color: "var(--color-teal)" },
-  vencida: { label: "Vencida", color: "var(--color-danger)" },
+};
+
+export const estadoParteMap = {
+  pendiente: { label: "Pendiente", color: "var(--color-slate)" },
+  facturado: { label: "Facturado", color: "var(--color-teal)" },
 };
 
 export const CATEGORIAS = [

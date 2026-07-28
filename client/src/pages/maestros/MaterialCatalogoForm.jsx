@@ -3,15 +3,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../../lib/api";
 import { Button, Field, Input, Select } from "../../components/ui";
 
-const empty = { tipo: "fisico", nombre: "", coste: "", precio_venta: "", proveedor: "" };
+const empty = { tipo: "fisico", nombre: "", coste: "", precio_venta: "", proveedor_id: "" };
 
 export default function MaterialCatalogoForm() {
   const { id } = useParams();
   const editing = Boolean(id);
   const navigate = useNavigate();
   const [form, setForm] = useState(empty);
+  const [proveedores, setProveedores] = useState([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    api.get("/proveedores?activo=1").then(setProveedores);
+  }, []);
 
   useEffect(() => {
     if (editing) {
@@ -21,7 +26,7 @@ export default function MaterialCatalogoForm() {
           nombre: m.nombre,
           coste: m.coste ?? "",
           precio_venta: m.precio_venta ?? "",
-          proveedor: m.proveedor || "",
+          proveedor_id: m.proveedor_id || "",
         })
       );
     }
@@ -40,6 +45,7 @@ export default function MaterialCatalogoForm() {
         ...form,
         coste: form.coste === "" ? 0 : Number(form.coste),
         precio_venta: form.precio_venta === "" ? 0 : Number(form.precio_venta),
+        proveedor_id: form.proveedor_id === "" ? null : Number(form.proveedor_id),
       };
       if (editing) await api.put(`/materiales-catalogo/${id}`, payload);
       else await api.post("/materiales-catalogo", payload);
@@ -75,7 +81,19 @@ export default function MaterialCatalogoForm() {
           </Field>
         </div>
         <Field label="Proveedor (opcional)">
-          <Input value={form.proveedor} onChange={set("proveedor")} />
+          <Select value={form.proveedor_id} onChange={set("proveedor_id")}>
+            <option value="">Sin especificar</option>
+            {proveedores.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.nombre}
+              </option>
+            ))}
+          </Select>
+          {proveedores.length === 0 && (
+            <span className="block text-xs text-muted mt-1">
+              Todavía no hay proveedores — puedes crear uno en Maestros → Proveedores.
+            </span>
+          )}
         </Field>
 
         {error && <p className="text-danger text-sm mb-3">{error}</p>}

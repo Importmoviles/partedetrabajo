@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Download, Trash2 } from "lucide-react";
 import { api } from "../../lib/api";
-import { Select, StatusBadge } from "../../components/ui";
-import { statusMap, formatEUR } from "../../lib/statusMap";
+import { StatusBadge } from "../../components/ui";
+import { estadoParteMap, formatEUR } from "../../lib/statusMap";
 
 export default function ParteDetail() {
   const { id } = useParams();
@@ -17,12 +17,6 @@ export default function ParteDetail() {
 
   useEffect(load, [id]);
 
-  async function handleEstadoChange(e) {
-    const estado = e.target.value;
-    await api.put(`/partes/${id}`, { estado });
-    load();
-  }
-
   async function handleDelete() {
     if (!confirm(`¿Borrar el parte de trabajo ${parte.numero}?`)) return;
     try {
@@ -34,7 +28,7 @@ export default function ParteDetail() {
   }
 
   if (!parte) return <p className="text-muted text-sm mt-6">Cargando...</p>;
-  const s = statusMap[parte.estado] || statusMap.borrador;
+  const s = estadoParteMap[parte.estado] || estadoParteMap.pendiente;
 
   return (
     <>
@@ -56,17 +50,13 @@ export default function ParteDetail() {
 
       {error && <p className="text-danger text-sm mt-2">{error}</p>}
 
-      <div className="mt-3 mb-3">
-        <label className="block text-xs font-medium text-muted mb-1">Estado</label>
-        <Select value={parte.estado} onChange={handleEstadoChange} className="max-w-[180px]">
-          <option value="borrador">Borrador</option>
-          <option value="emitida">Emitida</option>
-          <option value="pagada">Pagada</option>
-          <option value="vencida">Vencida</option>
-        </Select>
-      </div>
+      {parte.estado === "pendiente" && (
+        <p className="text-xs text-muted mt-2 mb-1">
+          Este parte pasará a "Facturado" automáticamente cuando se incluya en una factura desde el CRM.
+        </p>
+      )}
 
-      <div className="bg-surface border border-line rounded-2xl p-3.5 text-sm">
+      <div className="bg-surface border border-line rounded-2xl p-3.5 text-sm mt-3">
         {parte.lineas.map((l) => (
           <div key={l.id} className="flex justify-between py-1.5 border-b border-line last:border-0">
             <span className="text-ink">

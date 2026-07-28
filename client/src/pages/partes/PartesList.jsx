@@ -16,16 +16,14 @@ export default function PartesList() {
 
   if (loading) return <p className="text-muted text-sm mt-6">Cargando...</p>;
 
-  const emitidos = partes.filter((p) => p.estado === "emitida").length;
-  const pagados = partes.filter((p) => p.estado === "pagada").length;
-  const vencidos = partes.filter((p) => p.estado === "vencida").length;
+  const pendientes = partes.filter((p) => p.estado === "pendiente").length;
+  const facturados = partes.filter((p) => p.estado === "facturado").length;
 
   return (
     <>
       <div className="flex gap-2.5 mt-2">
-        <Stat label="Emitidos" value={emitidos} accent="var(--color-brand)" />
-        <Stat label="Pagados" value={pagados} accent="var(--color-teal)" />
-        <Stat label="Vencidos" value={vencidos} accent="var(--color-danger)" />
+        <Stat label="Pendientes" value={pendientes} accent="var(--color-slate)" />
+        <Stat label="Facturados" value={facturados} accent="var(--color-teal)" />
       </div>
       <SectionLabel>Todos los partes de trabajo</SectionLabel>
       {partes.length === 0 && <p className="text-sm text-muted">Todavía no hay partes de trabajo.</p>}
