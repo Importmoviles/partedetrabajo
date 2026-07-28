@@ -13,12 +13,8 @@ import PartesList from "./pages/partes/PartesList";
 import ParteForm from "./pages/partes/ParteForm";
 import ParteDetail from "./pages/partes/ParteDetail";
 import MaestrosHome from "./pages/maestros/MaestrosHome";
-import MaterialesCatalogoList from "./pages/maestros/MaterialesCatalogoList";
-import MaterialCatalogoForm from "./pages/maestros/MaterialCatalogoForm";
 import UsuariosList from "./pages/maestros/UsuariosList";
 import UsuarioForm from "./pages/maestros/UsuarioForm";
-import ProveedoresList from "./pages/maestros/ProveedoresList";
-import ProveedorForm from "./pages/maestros/ProveedorForm";
 import TareasList from "./pages/tareas/TareasList";
 import TareaForm from "./pages/tareas/TareaForm";
 
@@ -68,15 +64,9 @@ export default function App() {
         <Route path="tareas/:id/editar" element={<TareaForm />} />
 
         <Route path="maestros" element={<MaestrosHome />} />
-        <Route path="maestros/materiales" element={<MaterialesCatalogoList />} />
-        <Route path="maestros/materiales/nuevo" element={<MaterialCatalogoForm />} />
-        <Route path="maestros/materiales/:id/editar" element={<MaterialCatalogoForm />} />
         <Route path="maestros/usuarios" element={<UsuariosList />} />
         <Route path="maestros/usuarios/nuevo" element={<UsuarioForm />} />
         <Route path="maestros/usuarios/:id/editar" element={<UsuarioForm />} />
-        <Route path="maestros/proveedores" element={<ProveedoresList />} />
-        <Route path="maestros/proveedores/nuevo" element={<ProveedorForm />} />
-        <Route path="maestros/proveedores/:id/editar" element={<ProveedorForm />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

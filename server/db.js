@@ -136,11 +136,22 @@ CREATE TABLE IF NOT EXISTS proveedores (
 
 CREATE TABLE IF NOT EXISTS materiales_catalogo (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  tipo TEXT NOT NULL DEFAULT 'fisico',
+  tipo TEXT NOT NULL DEFAULT 'material',
   nombre TEXT NOT NULL,
   coste REAL NOT NULL DEFAULT 0,
   precio_venta REAL NOT NULL DEFAULT 0,
   proveedor TEXT,
+  activo INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS equipos_cliente (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cliente_id INTEGER NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+  marca TEXT,
+  modelo TEXT,
+  numero_serie TEXT,
+  notas TEXT,
   activo INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -165,6 +176,10 @@ CREATE TABLE IF NOT EXISTS documentos (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `);
+
+// --- Migración: tipos de materiales_catalogo (fisico/licencia -> material/software, + servicio) ---
+db.exec("UPDATE materiales_catalogo SET tipo = 'material' WHERE tipo = 'fisico'");
+db.exec("UPDATE materiales_catalogo SET tipo = 'software' WHERE tipo = 'licencia'");
 
 // --- Migración: proveedor (texto libre) -> proveedor_id (tabla proveedores real) ---
 if (!columnExists("materiales_catalogo", "proveedor_id")) {

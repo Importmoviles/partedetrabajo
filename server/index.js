@@ -16,6 +16,7 @@ const materialesCatalogoRoutes = require("./routes/materialesCatalogo");
 const usuariosRoutes = require("./routes/usuarios");
 const tareasRoutes = require("./routes/tareas");
 const proveedoresRoutes = require("./routes/proveedores");
+const equiposClienteRoutes = require("./routes/equiposCliente");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -44,6 +45,7 @@ app.use("/api/materiales-catalogo", requireAuth, materialesCatalogoRoutes);
 app.use("/api/usuarios", requireAuth, usuariosRoutes);
 app.use("/api/tareas", requireAuth, tareasRoutes);
 app.use("/api/proveedores", requireAuth, proveedoresRoutes);
+app.use("/api/equipos-cliente", requireAuth, equiposClienteRoutes);
 
 // En producción, Express sirve el frontend ya compilado (npm run build en client/)
 const clientDist = path.join(__dirname, "client-dist");

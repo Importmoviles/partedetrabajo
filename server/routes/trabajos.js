@@ -21,6 +21,38 @@ function withCliente(trabajo) {
   return { ...trabajo, cliente_nombre: cliente ? cliente.nombre : null };
 }
 
+// El alta/edición completa de equipos vive en el CRM (Maestros → Equipos), pero cada vez
+// que se registra un equipo afectado en un parte se da de alta (o se reutiliza) aquí mismo,
+// para que un técnico nunca tenga que volver a escribirlo en la próxima visita.
+function upsertEquipoCliente(clienteId, marca, modelo, numeroSerie) {
+  const m = (marca || "").trim();
+  const mo = (modelo || "").trim();
+  const ns = (numeroSerie || "").trim();
+  if (!m && !mo && !ns) return;
+
+  const existente = db
+    .prepare(
+      `SELECT id, activo FROM equipos_cliente
+       WHERE cliente_id = ?
+         AND IFNULL(marca, '') = ? COLLATE NOCASE
+         AND IFNULL(modelo, '') = ? COLLATE NOCASE
+         AND IFNULL(numero_serie, '') = ? COLLATE NOCASE`
+    )
+    .get(clienteId, m, mo, ns);
+
+  if (existente) {
+    if (!existente.activo) db.prepare("UPDATE equipos_cliente SET activo = 1 WHERE id = ?").run(existente.id);
+    return;
+  }
+
+  db.prepare("INSERT INTO equipos_cliente (cliente_id, marca, modelo, numero_serie, activo) VALUES (?, ?, ?, ?, 1)").run(
+    clienteId,
+    m || null,
+    mo || null,
+    ns || null
+  );
+}
+
 router.get("/meta", (req, res) => {
   res.json({ categorias: CATEGORIAS, estados: ESTADOS });
 });
@@ -90,6 +122,7 @@ router.post("/", (req, res) => {
     for (const eq of equipos) {
       if (eq.marca || eq.modelo || eq.numero_serie) {
         insertEquipo.run(trabajoId, eq.marca || null, eq.modelo || null, eq.numero_serie || null);
+        upsertEquipoCliente(cliente_id, eq.marca, eq.modelo, eq.numero_serie);
       }
     }
   }
@@ -137,9 +170,14 @@ router.delete("/:id", (req, res) => {
 // --- Equipos afectados ---
 router.post("/:id/equipos", (req, res) => {
   const { marca, modelo, numero_serie } = req.body;
+  const trabajo = db.prepare("SELECT cliente_id FROM trabajos WHERE id = ?").get(req.params.id);
+  if (!trabajo) return res.status(404).json({ error: "Trabajo no encontrado" });
+
   const info = db
     .prepare("INSERT INTO equipos_afectados (trabajo_id, marca, modelo, numero_serie) VALUES (?, ?, ?, ?)")
     .run(req.params.id, marca || null, modelo || null, numero_serie || null);
+  upsertEquipoCliente(trabajo.cliente_id, marca, modelo, numero_serie);
+
   res.status(201).json(db.prepare("SELECT * FROM equipos_afectados WHERE id = ?").get(info.lastInsertRowid));
 });
 
@@ -158,7 +196,7 @@ router.post("/:id/materiales", (req, res) => {
       `INSERT INTO materiales (trabajo_id, tipo, nombre, cantidad, coste, precio_venta, proveedor)
        VALUES (?, ?, ?, ?, ?, ?, ?)`
     )
-    .run(req.params.id, tipo || "fisico", nombre, cantidad || 1, coste || 0, precio_venta || 0, proveedor || null);
+    .run(req.params.id, tipo || "material", nombre, cantidad || 1, coste || 0, precio_venta || 0, proveedor || null);
 
   res.status(201).json(db.prepare("SELECT * FROM materiales WHERE id = ?").get(info.lastInsertRowid));
 });

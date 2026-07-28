@@ -6,10 +6,11 @@ import { Button, Input, SectionLabel, Select, StatusBadge, StatusDot } from "../
 import { trabajoCodigo } from "../../components/cards";
 import DocumentosSection from "../../components/DocumentosSection";
 import MaterialAutocomplete from "../../components/MaterialAutocomplete";
+import EquipoAutocomplete from "../../components/EquipoAutocomplete";
 import { estadoTrabajoMap, formatEUR } from "../../lib/statusMap";
 
 const emptyEquipo = { marca: "", modelo: "", numero_serie: "" };
-const emptyMaterial = { tipo: "fisico", nombre: "", cantidad: 1, coste: "", precio_venta: "", proveedor: "" };
+const emptyMaterial = { tipo: "material", nombre: "", cantidad: 1, coste: "", precio_venta: "", proveedor: "" };
 
 export default function TrabajoDetail() {
   const { id } = useParams();
@@ -18,6 +19,7 @@ export default function TrabajoDetail() {
   const [error, setError] = useState("");
   const [equipoForm, setEquipoForm] = useState(emptyEquipo);
   const [showEquipoForm, setShowEquipoForm] = useState(false);
+  const [equiposCliente, setEquiposCliente] = useState([]);
   const [materialForm, setMaterialForm] = useState(emptyMaterial);
   const [showMaterialForm, setShowMaterialForm] = useState(false);
   const [catalogo, setCatalogo] = useState([]);
@@ -32,6 +34,16 @@ export default function TrabajoDetail() {
 
   useEffect(load, [id]);
   useEffect(loadCatalogo, []);
+
+  useEffect(() => {
+    if (trabajo?.cliente_id) {
+      api.get(`/equipos-cliente?cliente_id=${trabajo.cliente_id}&activo=1`).then(setEquiposCliente);
+    }
+  }, [trabajo?.cliente_id]);
+
+  function selectEquipoCliente(item) {
+    setEquipoForm({ marca: item.marca || "", modelo: item.modelo || "", numero_serie: item.numero_serie || "" });
+  }
 
   async function handleDelete() {
     if (!confirm("¿Borrar este trabajo? Esta acción no se puede deshacer.")) return;
@@ -165,6 +177,7 @@ export default function TrabajoDetail() {
       ))}
       {showEquipoForm && (
         <form onSubmit={addEquipo} className="bg-surface border border-line rounded-xl p-3 mb-2">
+          <EquipoAutocomplete items={equiposCliente} onSelect={selectEquipoCliente} />
           <div className="grid grid-cols-2 gap-2 mb-2">
             <Input placeholder="Marca" value={equipoForm.marca} onChange={(e) => setEquipoForm({ ...equipoForm, marca: e.target.value })} />
             <Input placeholder="Modelo" value={equipoForm.modelo} onChange={(e) => setEquipoForm({ ...equipoForm, modelo: e.target.value })} />
@@ -206,8 +219,9 @@ export default function TrabajoDetail() {
         <form onSubmit={addMaterial} className="bg-surface border border-line rounded-xl p-3 mb-2">
           <div className="grid grid-cols-2 gap-2 mb-2">
             <Select value={materialForm.tipo} onChange={(e) => setMaterialForm({ ...materialForm, tipo: e.target.value })}>
-              <option value="fisico">Físico</option>
-              <option value="licencia">Licencia/software</option>
+              <option value="material">Material</option>
+              <option value="software">Software</option>
+              <option value="servicio">Servicio</option>
             </Select>
             <Input placeholder="Proveedor" value={materialForm.proveedor} onChange={(e) => setMaterialForm({ ...materialForm, proveedor: e.target.value })} />
           </div>

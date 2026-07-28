@@ -100,9 +100,22 @@ client/
 ## Relación con el CRM (panel-crm)
 
 Esta app es la "dueña" del esquema base de la base de datos compartida (`clientes`, `trabajos`, `partes`,
-`usuarios`, `materiales_catalogo`, `proveedores`...). El CRM (`../panel-crm`) abre el mismo archivo
-`panel.db` y solo añade cosas encima (más columnas en clientes, contactos, facturas reales, gastos) —
-por eso esta app siempre tiene que arrancar primero, al menos una vez, para crear el esquema base.
+`usuarios`, `materiales_catalogo`, `proveedores`, `equipos_cliente`...). El CRM (`../panel-crm`) abre el
+mismo archivo `panel.db` y solo añade cosas encima (más columnas en clientes, contactos, facturas reales,
+gastos) — por eso esta app siempre tiene que arrancar primero, al menos una vez, para crear el esquema base.
+
+**El alta y edición de clientes, proveedores, artículos (materiales_catalogo) y equipos se gestiona
+desde el CRM** (Maestros), no desde aquí. Esta app solo conserva:
+- Lectura de clientes/proveedores/artículos (para los desplegables y el autocompletado al rellenar un parte).
+- Alta rápida de un artículo nuevo desde el propio parte (autocompletado "+ Crear en el catálogo"), para
+  que un técnico no tenga que salir de la app para dar de alta algo que ve por primera vez.
+- Alta automática (sin pantalla propia) de un equipo en `equipos_cliente` cada vez que se registra un
+  equipo afectado en un parte — si ya existía uno igual para ese cliente, se reutiliza en vez de duplicar.
+  El autocompletado de "Equipos afectados" en un parte busca en los equipos ya conocidos de ese cliente.
+- Su propio Maestros → Usuarios (altas/bajas de acceso al panel), que no se movió al CRM.
+
+Los tipos de `materiales_catalogo.tipo` son `material` / `software` / `servicio` (antes eran
+`fisico`/`licencia`; se migran automáticamente al arrancar con datos antiguos).
 
 ## Qué falta para la Fase 2 (portal de clientes)
 

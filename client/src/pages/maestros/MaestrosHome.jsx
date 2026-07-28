@@ -1,10 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { Boxes, Users, Truck, ChevronRight } from "lucide-react";
+import { Users, ChevronRight } from "lucide-react";
 import { Card, SectionLabel } from "../../components/ui";
 
 const secciones = [
-  { to: "/maestros/materiales", label: "Materiales y componentes", desc: "Catálogo reutilizable en los trabajos", icon: Boxes },
-  { to: "/maestros/proveedores", label: "Proveedores", desc: "Fichas de proveedores para materiales y compras", icon: Truck },
   { to: "/maestros/usuarios", label: "Usuarios", desc: "Altas, bajas y contraseñas de acceso al panel", icon: Users },
 ];
 
@@ -14,6 +12,9 @@ export default function MaestrosHome() {
   return (
     <>
       <SectionLabel>Maestros</SectionLabel>
+      <p className="text-xs text-muted mb-3">
+        El alta de clientes, proveedores, artículos y equipos se gestiona ahora desde el CRM.
+      </p>
       {secciones.map((s) => (
         <Card key={s.to} onClick={() => navigate(s.to)}>
           <div className="flex items-center justify-between">

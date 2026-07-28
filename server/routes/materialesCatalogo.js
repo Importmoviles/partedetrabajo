@@ -22,6 +22,9 @@ router.get("/:id", (req, res) => {
   res.json(item);
 });
 
+// El alta completa (editar, activar/desactivar) se gestiona desde el CRM (Maestros → Artículos).
+// Se mantiene POST aquí porque el autocompletado de materiales en un parte de trabajo permite
+// crear un artículo nuevo sobre la marcha sin salir de la app de Partes.
 router.post("/", (req, res) => {
   const { tipo, nombre, coste, precio_venta, proveedor_id } = req.body;
   if (!nombre) return res.status(400).json({ error: "El nombre es obligatorio" });
@@ -31,39 +34,9 @@ router.post("/", (req, res) => {
       `INSERT INTO materiales_catalogo (tipo, nombre, coste, precio_venta, proveedor_id, activo)
        VALUES (?, ?, ?, ?, ?, 1)`
     )
-    .run(tipo || "fisico", nombre, coste || 0, precio_venta || 0, proveedor_id || null);
+    .run(tipo || "material", nombre, coste || 0, precio_venta || 0, proveedor_id || null);
 
   res.status(201).json(db.prepare("SELECT * FROM materiales_catalogo WHERE id = ?").get(info.lastInsertRowid));
-});
-
-router.put("/:id", (req, res) => {
-  const existing = db.prepare("SELECT * FROM materiales_catalogo WHERE id = ?").get(req.params.id);
-  if (!existing) return res.status(404).json({ error: "No encontrado" });
-
-  const { tipo, nombre, coste, precio_venta, proveedor_id, activo } = req.body;
-  if (!nombre) return res.status(400).json({ error: "El nombre es obligatorio" });
-
-  db.prepare(
-    `UPDATE materiales_catalogo SET tipo = ?, nombre = ?, coste = ?, precio_venta = ?, proveedor_id = ?, activo = ? WHERE id = ?`
-  ).run(
-    tipo || existing.tipo,
-    nombre,
-    coste !== undefined ? coste : existing.coste,
-    precio_venta !== undefined ? precio_venta : existing.precio_venta,
-    proveedor_id !== undefined ? proveedor_id || null : existing.proveedor_id,
-    activo !== undefined ? (activo ? 1 : 0) : existing.activo,
-    req.params.id
-  );
-
-  res.json(db.prepare("SELECT * FROM materiales_catalogo WHERE id = ?").get(req.params.id));
-});
-
-router.post("/:id/toggle", (req, res) => {
-  const existing = db.prepare("SELECT * FROM materiales_catalogo WHERE id = ?").get(req.params.id);
-  if (!existing) return res.status(404).json({ error: "No encontrado" });
-
-  db.prepare("UPDATE materiales_catalogo SET activo = ? WHERE id = ?").run(existing.activo ? 0 : 1, req.params.id);
-  res.json(db.prepare("SELECT * FROM materiales_catalogo WHERE id = ?").get(req.params.id));
 });
 
 module.exports = router;
