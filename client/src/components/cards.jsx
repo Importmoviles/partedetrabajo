@@ -1,4 +1,4 @@
-import { Clock, ChevronRight } from "lucide-react";
+import { Clock, ChevronRight, Power } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card, StatusDot, StatusBadge } from "./ui";
 import { estadoTrabajoMap, estadoParteMap, formatEUR } from "../lib/statusMap";
@@ -51,18 +51,36 @@ export function ParteCard({ parte }) {
   );
 }
 
-export function ClientCard({ c }) {
+export function ClientCard({ c, onToggle }) {
   const navigate = useNavigate();
   return (
     <Card onClick={() => navigate(`/clientes/${c.id}`)}>
-      <div className="flex items-center justify-between">
+      <div className={`flex items-center justify-between ${c.activo ? "" : "opacity-60"}`}>
         <div>
-          <div className="font-display text-[15px] font-semibold text-ink">{c.nombre}</div>
+          <div className="font-display text-[15px] font-semibold text-ink">{c.nombre_comercial || c.nombre}</div>
+          {c.nombre_comercial && c.nombre_comercial !== c.nombre && (
+            <div className="text-xs text-muted mt-0.5">{c.nombre}</div>
+          )}
           <div className="text-xs text-muted mt-0.5">
             {c.num_trabajos} trabajo{c.num_trabajos === 1 ? "" : "s"} · {formatEUR(c.tarifa_hora)}/h
           </div>
         </div>
-        <ChevronRight size={16} color="var(--color-muted)" />
+        <div className="flex items-center gap-2 shrink-0">
+          {!c.activo && <StatusBadge label="Inactivo" color="var(--color-danger)" />}
+          {onToggle && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle(c.id);
+              }}
+              className={c.activo ? "text-brand p-1" : "text-danger p-1"}
+              title={c.activo ? "Dar de baja" : "Reactivar"}
+            >
+              <Power size={15} />
+            </button>
+          )}
+          <ChevronRight size={16} color="var(--color-muted)" />
+        </div>
       </div>
     </Card>
   );

@@ -4,13 +4,15 @@ const db = require("../db");
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  const clientes = db
-    .prepare(
-      `SELECT c.*, (SELECT COUNT(*) FROM trabajos t WHERE t.cliente_id = c.id) AS num_trabajos
-       FROM clientes c ORDER BY c.nombre COLLATE NOCASE`
-    )
-    .all();
-  res.json(clientes);
+  const { activo } = req.query;
+  let sql = `SELECT c.*, (SELECT COUNT(*) FROM trabajos t WHERE t.cliente_id = c.id) AS num_trabajos FROM clientes c`;
+  const params = [];
+  if (activo !== undefined) {
+    sql += " WHERE c.activo = ?";
+    params.push(activo === "1" || activo === "true" ? 1 : 0);
+  }
+  sql += " ORDER BY c.activo DESC, c.nombre COLLATE NOCASE";
+  res.json(db.prepare(sql).all(...params));
 });
 
 router.get("/:id", (req, res) => {
@@ -38,6 +40,10 @@ router.post("/", (req, res) => {
     )
     .run(nombre, nif || null, direccion || null, telefono || null, email || null, tarifa_hora || 0, notas || null, fecha_alta || null);
 
+  // nombre_comercial es una columna que suele gestionar el CRM, pero por defecto debe
+  // coincidir con el nombre también cuando el cliente se crea desde aquí.
+  db.prepare("UPDATE clientes SET nombre_comercial = ? WHERE id = ? AND nombre_comercial IS NULL").run(nombre, info.lastInsertRowid);
+
   const cliente = db.prepare("SELECT * FROM clientes WHERE id = ?").get(info.lastInsertRowid);
   res.status(201).json(cliente);
 });
@@ -54,6 +60,14 @@ router.put("/:id", (req, res) => {
      WHERE id = ?`
   ).run(nombre, nif || null, direccion || null, telefono || null, email || null, tarifa_hora || 0, notas || null, fecha_alta || existing.fecha_alta, req.params.id);
 
+  res.json(db.prepare("SELECT * FROM clientes WHERE id = ?").get(req.params.id));
+});
+
+router.post("/:id/toggle", (req, res) => {
+  const existing = db.prepare("SELECT * FROM clientes WHERE id = ?").get(req.params.id);
+  if (!existing) return res.status(404).json({ error: "Cliente no encontrado" });
+
+  db.prepare("UPDATE clientes SET activo = ? WHERE id = ?").run(existing.activo ? 0 : 1, req.params.id);
   res.json(db.prepare("SELECT * FROM clientes WHERE id = ?").get(req.params.id));
 });
 

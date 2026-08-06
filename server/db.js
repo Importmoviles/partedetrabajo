@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS clientes (
   email TEXT,
   tarifa_hora REAL DEFAULT 0,
   notas TEXT,
+  activo INTEGER NOT NULL DEFAULT 1,
   fecha_alta TEXT NOT NULL DEFAULT (date('now'))
 );
 
@@ -125,10 +126,15 @@ CREATE TABLE IF NOT EXISTS proveedores (
   nombre TEXT NOT NULL,
   nif TEXT,
   direccion TEXT,
+  codigo_postal TEXT,
+  poblacion TEXT,
+  provincia TEXT,
   telefono TEXT,
   email TEXT,
   contacto TEXT,
   categoria TEXT,
+  forma_pago TEXT,
+  iban TEXT,
   notas TEXT,
   activo INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -176,6 +182,30 @@ CREATE TABLE IF NOT EXISTS documentos (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `);
+
+// --- "nombre_comercial" lo añade normalmente el CRM (columna comercial), pero se garantiza
+// también aquí de forma aditiva para que la búsqueda de clientes funcione aunque el CRM
+// todavía no haya arrancado nunca contra esta base de datos ---
+if (!columnExists("clientes", "nombre_comercial")) {
+  db.exec("ALTER TABLE clientes ADD COLUMN nombre_comercial TEXT");
+  db.exec("UPDATE clientes SET nombre_comercial = nombre WHERE nombre_comercial IS NULL");
+}
+if (!columnExists("clientes", "activo")) {
+  db.exec("ALTER TABLE clientes ADD COLUMN activo INTEGER NOT NULL DEFAULT 1");
+}
+
+// --- Campos de proveedores añadidos desde el CRM, garantizados también aquí ---
+for (const [columna, tipo] of Object.entries({
+  codigo_postal: "TEXT",
+  poblacion: "TEXT",
+  provincia: "TEXT",
+  forma_pago: "TEXT",
+  iban: "TEXT",
+})) {
+  if (!columnExists("proveedores", columna)) {
+    db.exec(`ALTER TABLE proveedores ADD COLUMN ${columna} ${tipo}`);
+  }
+}
 
 // --- Migración: tipos de materiales_catalogo (fisico/licencia -> material/software, + servicio) ---
 db.exec("UPDATE materiales_catalogo SET tipo = 'material' WHERE tipo = 'fisico'");

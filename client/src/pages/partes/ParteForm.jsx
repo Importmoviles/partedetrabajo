@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Plus, X } from "lucide-react";
 import { api } from "../../lib/api";
 import { Button, Field, Input, Select } from "../../components/ui";
+import ClienteAutocomplete from "../../components/ClienteAutocomplete";
 import { formatEUR } from "../../lib/statusMap";
 
 const emptyLinea = { tipo: "fijo", descripcion: "", cantidad: 1, precio_unitario: "" };
@@ -14,6 +15,7 @@ export default function ParteForm() {
 
   const [clientes, setClientes] = useState([]);
   const [clienteId, setClienteId] = useState("");
+  const [clienteTexto, setClienteTexto] = useState("");
   const [iva, setIva] = useState(21);
   const [lineas, setLineas] = useState([{ ...emptyLinea }]);
   const [trabajoIds, setTrabajoIds] = useState([]);
@@ -29,6 +31,7 @@ export default function ParteForm() {
     if (trabajoId) {
       api.get(`/trabajos/${trabajoId}`).then((t) => {
         setClienteId(String(t.cliente_id));
+        setClienteTexto(t.cliente_nombre || "");
         setTrabajoIds([t.id]);
         const nuevasLineas = [];
         if (t.horas > 0) {
@@ -67,6 +70,13 @@ export default function ParteForm() {
       setLoaded(true);
     }
   }, [trabajoId]);
+
+  function selectCliente(cliente) {
+    setClienteId(String(cliente.id));
+    setClienteTexto(cliente.nombre_comercial || cliente.nombre);
+  }
+
+  const clienteSeleccionado = clientes.find((c) => String(c.id) === String(clienteId));
 
   function updateLinea(idx, field, value) {
     setLineas((prev) => prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)));
@@ -118,14 +128,17 @@ export default function ParteForm() {
       <h1 className="font-display text-lg font-semibold mt-4 mb-4">Nuevo parte de trabajo</h1>
       <form onSubmit={handleSubmit}>
         <Field label="Cliente *">
-          <Select value={clienteId} onChange={(e) => setClienteId(e.target.value)} disabled={Boolean(trabajoId)}>
-            <option value="">Selecciona un cliente...</option>
-            {clientes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </Select>
+          <ClienteAutocomplete
+            items={clientes.filter((c) => c.activo)}
+            value={clienteTexto}
+            selected={clienteSeleccionado}
+            disabled={Boolean(trabajoId)}
+            onChangeText={(texto) => {
+              setClienteTexto(texto);
+              setClienteId("");
+            }}
+            onSelect={selectCliente}
+          />
         </Field>
 
         <div className="flex items-center justify-between mt-4 mb-2">

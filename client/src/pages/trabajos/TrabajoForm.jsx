@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../../lib/api";
 import { Button, Field, Input, Select, Textarea } from "../../components/ui";
+import ClienteAutocomplete from "../../components/ClienteAutocomplete";
 import { CATEGORIAS } from "../../lib/statusMap";
 
 const empty = {
@@ -22,12 +23,22 @@ export default function TrabajoForm() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ ...empty, cliente_id: searchParams.get("cliente_id") || "" });
   const [clientes, setClientes] = useState([]);
+  const [clienteTexto, setClienteTexto] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     api.get("/clientes").then(setClientes);
   }, []);
+
+  // Si el cliente ya viene preseleccionado (editando, o desde la ficha de un cliente),
+  // muestra su nombre en el buscador en cuanto se conoce tanto el cliente como la lista.
+  useEffect(() => {
+    if (form.cliente_id && clientes.length > 0 && !clienteTexto) {
+      const seleccionado = clientes.find((c) => String(c.id) === String(form.cliente_id));
+      if (seleccionado) setClienteTexto(seleccionado.nombre_comercial || seleccionado.nombre);
+    }
+  }, [form.cliente_id, clientes]);
 
   useEffect(() => {
     if (editing) {
@@ -45,6 +56,13 @@ export default function TrabajoForm() {
       );
     }
   }, [id, editing]);
+
+  function selectCliente(cliente) {
+    setForm({ ...form, cliente_id: cliente.id });
+    setClienteTexto(cliente.nombre_comercial || cliente.nombre);
+  }
+
+  const clienteSeleccionado = clientes.find((c) => String(c.id) === String(form.cliente_id));
 
   function set(field) {
     return (e) => setForm({ ...form, [field]: e.target.value });
@@ -74,14 +92,16 @@ export default function TrabajoForm() {
       <h1 className="font-display text-lg font-semibold mt-4 mb-4">{editing ? "Editar trabajo" : "Nuevo trabajo"}</h1>
       <form onSubmit={handleSubmit}>
         <Field label="Cliente *">
-          <Select value={form.cliente_id} onChange={set("cliente_id")} required>
-            <option value="">Selecciona un cliente...</option>
-            {clientes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </Select>
+          <ClienteAutocomplete
+            items={clientes.filter((c) => c.activo)}
+            value={clienteTexto}
+            selected={clienteSeleccionado}
+            onChangeText={(texto) => {
+              setClienteTexto(texto);
+              setForm({ ...form, cliente_id: "" });
+            }}
+            onSelect={selectCliente}
+          />
         </Field>
 
         <Field label="Categoría *">
