@@ -174,6 +174,16 @@ CREATE TABLE IF NOT EXISTS establecimientos (
   persona_contacto TEXT,
   telefono TEXT,
   email TEXT,
+  iban TEXT,
+  forma_pago TEXT,
+  mandato_referencia TEXT,
+  mandato_fecha TEXT,
+  mandato_nombre_original TEXT,
+  mandato_nombre_archivo TEXT,
+  mandato_mime_type TEXT,
+  stripe_customer_id TEXT,
+  stripe_payment_method_id TEXT,
+  stripe_mandate_id TEXT,
   activo INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
