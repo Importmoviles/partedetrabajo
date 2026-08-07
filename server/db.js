@@ -162,6 +162,22 @@ CREATE TABLE IF NOT EXISTS equipos_cliente (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS establecimientos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cliente_id INTEGER NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+  nombre TEXT NOT NULL,
+  nif TEXT,
+  direccion TEXT,
+  codigo_postal TEXT,
+  poblacion TEXT,
+  provincia TEXT,
+  persona_contacto TEXT,
+  telefono TEXT,
+  email TEXT,
+  activo INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS tareas (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   titulo TEXT NOT NULL,
