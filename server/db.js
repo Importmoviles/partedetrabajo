@@ -174,16 +174,6 @@ CREATE TABLE IF NOT EXISTS establecimientos (
   persona_contacto TEXT,
   telefono TEXT,
   email TEXT,
-  iban TEXT,
-  forma_pago TEXT,
-  mandato_referencia TEXT,
-  mandato_fecha TEXT,
-  mandato_nombre_original TEXT,
-  mandato_nombre_archivo TEXT,
-  mandato_mime_type TEXT,
-  stripe_customer_id TEXT,
-  stripe_payment_method_id TEXT,
-  stripe_mandate_id TEXT,
   activo INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -230,6 +220,25 @@ for (const [columna, tipo] of Object.entries({
 })) {
   if (!columnExists("proveedores", columna)) {
     db.exec(`ALTER TABLE proveedores ADD COLUMN ${columna} ${tipo}`);
+  }
+}
+
+// --- Domiciliación bancaria propia por establecimiento (añadida después de crear la tabla,
+// así que se garantiza también vía ALTER por si la tabla ya existía sin estas columnas) ---
+for (const [columna, tipo] of Object.entries({
+  iban: "TEXT",
+  forma_pago: "TEXT",
+  mandato_referencia: "TEXT",
+  mandato_fecha: "TEXT",
+  mandato_nombre_original: "TEXT",
+  mandato_nombre_archivo: "TEXT",
+  mandato_mime_type: "TEXT",
+  stripe_customer_id: "TEXT",
+  stripe_payment_method_id: "TEXT",
+  stripe_mandate_id: "TEXT",
+})) {
+  if (!columnExists("establecimientos", columna)) {
+    db.exec(`ALTER TABLE establecimientos ADD COLUMN ${columna} ${tipo}`);
   }
 }
 
